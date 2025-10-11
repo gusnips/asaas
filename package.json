@@ -19,8 +19,15 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
     "test": "bun test",
-    "prepublishOnly": "bun run build"
+    "clean": "rm -rf dist",
+    "prebuild": "bun run clean",
+    "prepublishOnly": "bun run lint && bun run typecheck && bun run build",
+    "release": "npm publish",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish"
   },
   "keywords": [
     "asaas",
@@ -47,13 +54,14 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     }
   }
 }

@@ -1,0 +1,59 @@
+{
+  "name": "asaas-sdk",
+  "version": "1.0.0",
+  "description": "Unofficial TypeScript SDK for Asaas API with domain-based architecture",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gusnips/asaas-sdk.git"
+  },
+  "homepage": "https://github.com/gusnips/asaas-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/gusnips/asaas-sdk/issues"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "asaas",
+    "payment",
+    "sdk",
+    "typescript",
+    "api-client"
+  ],
+  "author": "Gustavo Salomé (gusnips)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.12.2"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  }
+}

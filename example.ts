@@ -8,7 +8,7 @@ import {
   AsaasClient,
   AsaasBillingType,
   AsaasSubscriptionCycle,
-} from "./src/index.ts";
+} from "@gusnips/asaas";
 
 // Initialize the client
 const client = new AsaasClient({

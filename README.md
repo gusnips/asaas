@@ -17,19 +17,19 @@
 
 ```bash
 # Using bun
-bun add asaas-sdk
+bun add @gusnips/asaas
 
 # Using npm
-npm install asaas-sdk
+npm install @gusnips/asaas
 
 # Using yarn
-yarn add asaas-sdk
+yarn add @gusnips/asaas
 ```
 
 ## Quick Start
 
 ```typescript
-import { AsaasClient } from "asaas-sdk";
+import { AsaasClient } from "@gusnips/asaas";
 
 // Initialize the client
 const client = new AsaasClient({
@@ -696,7 +696,7 @@ The SDK provides comprehensive TypeScript type definitions for all API entities:
 The SDK throws `AsaasApiError` for API errors:
 
 ```typescript
-import { AsaasApiError } from "asaas-sdk";
+import { AsaasApiError } from "@gusnips/asaas";
 
 try {
   const customer = await client.customers.create({
@@ -778,5 +778,5 @@ MIT
 ## Links
 
 - [Asaas API Documentation](https://docs.asaas.com/)
-- [GitHub Repository](https://github.com/gusnips/asaas-sdk)
-- [NPM Package](https://www.npmjs.com/package/asaas-sdk)
+- [GitHub Repository](https://github.com/gusnips/asaas)
+- [NPM Package](https://www.npmjs.com/package/@gusnips/asaas)

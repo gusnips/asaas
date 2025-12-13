@@ -8,6 +8,7 @@ import {
   AsaasSubscriptionRequest,
   AsaasSubscriptionStatus,
   AsaasApiPaginatedResponse,
+  AsaasDeleteResponse,
 } from "../types/index.ts";
 
 /**
@@ -47,7 +48,7 @@ function calculateNextDueDateForReactivation(cycle: string): string {
 }
 
 export class SubscriptionsModule {
-  constructor(private client: AxiosInstance) {}
+  constructor(private client: AxiosInstance) { }
 
   /**
    * Retrieve a subscription
@@ -155,6 +156,18 @@ export class SubscriptionsModule {
       {
         status: AsaasSubscriptionStatus.INACTIVE,
       }
+    );
+    return response.data;
+  }
+
+  /**
+   * Delete a subscription
+   * @param subscriptionId The subscription ID
+   * @returns The delete response
+   */
+  async delete(subscriptionId: string): Promise<AsaasDeleteResponse> {
+    const response = await this.client.delete<AsaasDeleteResponse>(
+      `/subscriptions/${subscriptionId}`
     );
     return response.data;
   }

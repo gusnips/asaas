@@ -3,10 +3,10 @@
  */
 
 import { AxiosInstance } from "axios";
-import { AsaasCustomer, AsaasApiPaginatedResponse } from "../types/index.ts";
+import { AsaasCustomer, AsaasApiPaginatedResponse, AsaasDeleteResponse } from "../types/index.ts";
 
 export class CustomersModule {
-  constructor(private client: AxiosInstance) {}
+  constructor(private client: AxiosInstance) { }
 
   /**
    * Create a customer
@@ -66,5 +66,17 @@ export class CustomersModule {
       params: { limit, offset },
     });
     return response.data.data || [];
+  }
+
+  /**
+   * Delete a customer
+   * @param customerId The customer ID
+   * @returns The delete response
+   */
+  async delete(customerId: string): Promise<AsaasDeleteResponse> {
+    const response = await this.client.delete<AsaasDeleteResponse>(
+      `/customers/${customerId}`
+    );
+    return response.data;
   }
 }

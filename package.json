@@ -1,6 +1,6 @@
 {
   "name": "@gusnips/asaas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unofficial TypeScript SDK for Asaas API with domain-based architecture",
   "repository": {
     "type": "git",
@@ -34,7 +34,8 @@
     "payment",
     "sdk",
     "typescript",
-    "api-client"
+    "api-client",
+    "pagamento"
   ],
   "author": "Gustavo Salomé (gusnips)",
   "license": "MIT",

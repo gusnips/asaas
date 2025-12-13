@@ -69,3 +69,11 @@ export enum AsaasDiscountType {
  * Environment type for Asaas API
  */
 export type AsaasEnvironment = "production" | "sandbox";
+
+/**
+ * Delete response structure from Asaas API
+ */
+export interface AsaasDeleteResponse {
+  deleted: boolean;
+  id: string;
+}

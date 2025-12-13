@@ -24,7 +24,7 @@
     "clean": "rm -rf dist",
     "prebuild": "bun run clean",
     "prepublishOnly": "bun run lint && bun run typecheck && bun run build",
-    "release": "npm publish",
+    "release": "npm publish --access public",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish"

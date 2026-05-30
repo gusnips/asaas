@@ -1,782 +1,262 @@
-# Asaas SDK
+# @gusnips/asaas
 
-**Unofficial** TypeScript SDK for the Asaas payment gateway API with domain-based architecture.
+Unofficial TypeScript SDK for the [Asaas](https://www.asaas.com/) payment platform API.
 
-> ⚠️ **Note:** This is an unofficial SDK and is not affiliated with or endorsed by Asaas.
-
-## Features
-
-- ✅ Full TypeScript support with comprehensive type definitions
-- 🏗️ Domain-based architecture (`client.domain.method()`)
-- 🔒 Type-safe API with IntelliSense support
-- 🚀 Built with modern tools (Bun, TypeScript, ESLint)
-- 📦 Zero dependencies (except axios)
-- 🌍 Support for both production and sandbox environments
+Full coverage of the Asaas API v3 with typed interfaces, domain-based architecture, and proper error handling.
 
 ## Installation
 
 ```bash
-# Using bun
-bun add @gusnips/asaas
-
-# Using npm
 npm install @gusnips/asaas
-
-# Using yarn
+# or
 yarn add @gusnips/asaas
+# or
+bun add @gusnips/asaas
 ```
 
 ## Quick Start
 
 ```typescript
-import { AsaasClient } from "@gusnips/asaas";
+import { AsaasClient, AsaasBillingType } from "@gusnips/asaas";
 
-// Initialize the client
 const client = new AsaasClient({
-  apiKey: "your-api-key-here",
-  environment: "production", // or 'sandbox'
+  apiKey: "$your_api_key",
+  environment: "sandbox", // or 'production'
 });
 
 // Create a customer
 const customer = await client.customers.create({
   name: "John Doe",
+  cpfCnpj: "24971563792",
   email: "john@example.com",
-  cpfCnpj: "12345678901",
 });
 
-// Create a subscription
-const subscription = await client.subscriptions.create({
-  customer: customer.id,
-  billingType: "CREDIT_CARD",
-  value: 99.9,
-  cycle: "MONTHLY",
-  nextDueDate: "2025-11-01",
-});
-```
-
-## API Reference
-
-### Client Initialization
-
-```typescript
-const client = new AsaasClient({
-  apiKey: string;        // Your Asaas API key
-  environment?: 'production' | 'sandbox'; // Default: 'production'
-});
-```
-
----
-
-## Customers Module
-
-Manage customer information.
-
-### `client.customers.create(data)`
-
-Create a new customer.
-
-```typescript
-const customer = await client.customers.create({
-  name: "John Doe",
-  email: "john@example.com",
-  cpfCnpj: "12345678901",
-  phone: "1234567890",
-  mobilePhone: "11987654321",
-  postalCode: "12345-678",
-  addressNumber: "123",
-});
-```
-
-**Parameters:**
-
-- `name` (string, required): Customer name
-- `email` (string, required): Customer email
-- `cpfCnpj` (string, optional): Customer CPF or CNPJ
-- `phone` (string, optional): Phone number
-- `mobilePhone` (string, optional): Mobile phone number
-- `postalCode` (string, optional): Postal code
-- `addressNumber` (string, optional): Address number
-- Additional fields available in `AsaasCustomer` type
-
-**Returns:** `Promise<AsaasCustomer>`
-
-### `client.customers.retrieve(customerId)`
-
-Retrieve a customer by ID.
-
-```typescript
-const customer = await client.customers.retrieve("cus_123456");
-```
-
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-
-**Returns:** `Promise<AsaasCustomer>`
-
-### `client.customers.update(customerId, data)`
-
-Update customer information.
-
-```typescript
-const customer = await client.customers.update("cus_123456", {
-  name: "Jane Doe",
-  email: "jane@example.com",
-});
-```
-
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-- `data` (object, required): Customer data to update
-
-**Returns:** `Promise<AsaasCustomer>`
-
-### `client.customers.list(limit?, offset?)`
-
-List customers.
-
-```typescript
-const customers = await client.customers.list(100, 0);
-```
-
-**Parameters:**
-
-- `limit` (number, optional): Maximum number of results (default: 100)
-- `offset` (number, optional): Pagination offset (default: 0)
-
-**Returns:** `Promise<AsaasCustomer[]>`
-
----
-
-## Subscriptions Module
-
-Manage recurring subscriptions.
-
-### `client.subscriptions.create(data)`
-
-Create a new subscription.
-
-```typescript
-const subscription = await client.subscriptions.create({
-  customer: "cus_123456",
-  billingType: "CREDIT_CARD",
-  value: 99.9,
-  cycle: "MONTHLY",
-  nextDueDate: "2025-11-01",
-  description: "Monthly subscription",
-});
-```
-
-**Parameters:**
-
-- `customer` (string, required): Customer ID
-- `billingType` (string, required): Payment method (`BOLETO`, `CREDIT_CARD`, `PIX`, etc.)
-- `value` (number, required): Subscription value
-- `cycle` (string, required): Billing cycle (`WEEKLY`, `MONTHLY`, `YEARLY`, etc.)
-- `nextDueDate` (string, required): Next payment due date (YYYY-MM-DD)
-- `description` (string, optional): Subscription description
-- Additional fields available in `AsaasSubscription` type
-
-**Returns:** `Promise<AsaasSubscription>`
-
-### `client.subscriptions.retrieve(subscriptionId)`
-
-Retrieve a subscription by ID.
-
-```typescript
-const subscription = await client.subscriptions.retrieve("sub_123456");
-```
-
-**Parameters:**
-
-- `subscriptionId` (string, required): Subscription ID
-
-**Returns:** `Promise<AsaasSubscription>`
-
-### `client.subscriptions.list(customerId?, status?)`
-
-List subscriptions for a customer (or all subscriptions if no customer specified).
-
-```typescript
-// List for specific customer
-const subscriptions = await client.subscriptions.list("cus_123456", "ACTIVE");
-
-// List all subscriptions
-const allSubscriptions = await client.subscriptions.list();
-```
-
-**Parameters:**
-
-- `customerId` (string, optional): Customer ID to filter by
-- `status` (string, optional): Filter by status (`ACTIVE`, `INACTIVE`)
-
-**Returns:** `Promise<AsaasSubscription[]>`
-
-### `client.subscriptions.update(subscriptionId, data)`
-
-Update a subscription.
-
-```typescript
-const subscription = await client.subscriptions.update("sub_123456", {
-  value: 149.9,
-  nextDueDate: "2025-12-01",
-});
-```
-
-**Parameters:**
-
-- `subscriptionId` (string, required): Subscription ID
-- `data` (object, required): Subscription data to update
-
-**Returns:** `Promise<AsaasSubscription>`
-
-### `client.subscriptions.reactivate(subscriptionId, data?)`
-
-Reactivate a canceled subscription.
-
-```typescript
-const subscription = await client.subscriptions.reactivate("sub_123456");
-```
-
-**Parameters:**
-
-- `subscriptionId` (string, required): Subscription ID
-- `data` (object, optional): Additional subscription data
-
-**Returns:** `Promise<AsaasSubscription>`
-
-### `client.subscriptions.cancel(subscriptionId)`
-
-Cancel a subscription.
-
-```typescript
-const subscription = await client.subscriptions.cancel("sub_123456");
-```
-
-**Parameters:**
-
-- `subscriptionId` (string, required): Subscription ID
-
-**Returns:** `Promise<AsaasSubscription>`
-
----
-
-## Payments Module
-
-Manage individual payments and invoices.
-
-### `client.payments.create(data)`
-
-Create a new payment.
-
-```typescript
+// Create a payment
 const payment = await client.payments.create({
-  customer: "cus_123456",
-  billingType: "BOLETO",
-  value: 199.9,
-  dueDate: "2025-11-15",
-  description: "One-time payment",
-});
-```
-
-**Parameters:**
-
-- `customer` (string, required): Customer ID
-- `billingType` (string, required): Payment method
-- `value` (number, required): Payment value
-- `dueDate` (string, required): Payment due date (YYYY-MM-DD)
-- `description` (string, optional): Payment description
-- Additional fields available in `AsaasPayment` type
-
-**Returns:** `Promise<AsaasPayment>`
-
-### `client.payments.retrieve(paymentId)`
-
-Retrieve a payment by ID.
-
-```typescript
-const payment = await client.payments.retrieve("pay_123456");
-```
-
-**Parameters:**
-
-- `paymentId` (string, required): Payment ID
-
-**Returns:** `Promise<AsaasPayment>`
-
-### `client.payments.update(paymentId, data)`
-
-Update a payment.
-
-```typescript
-const payment = await client.payments.update("pay_123456", {
-  value: 249.9,
+  customer: customer.id,
+  billingType: AsaasBillingType.PIX,
+  value: 100.0,
   dueDate: "2025-12-15",
 });
+
+// Get PIX QR code
+const pixQr = await client.payments.getPixQrCode(payment.id);
 ```
 
-**Parameters:**
+## Modules
 
-- `paymentId` (string, required): Payment ID
-- `data` (object, required): Payment data to update
+| Module | Access | Description |
+|--------|--------|-------------|
+| Customers | `client.customers` | Customer CRUD, restore, list with filters |
+| Payments | `client.payments` | Charges, refunds, status, PIX QR, boleto, credit card |
+| Subscriptions | `client.subscriptions` | Recurring billing management |
+| Installments | `client.installments` | Installment payments |
+| Payment Links | `client.paymentLinks` | Shareable payment links |
+| Transfers | `client.transfers` | Bank transfers, PIX, internal |
+| PIX | `client.pix` | Address keys, QR codes, transactions |
+| Finance | `client.finance` | Balance, extract, statistics |
+| Invoices | `client.invoices` | Nota Fiscal (NFS-e) management |
+| Bills | `client.bills` | Bill payments (boletos de terceiros) |
+| Anticipations | `client.anticipations` | Receivable anticipation |
+| Webhooks | `client.webhooks` | Webhook configuration |
+| Accounts | `client.accounts` | Sub-accounts (White Label) |
+| Payment Dunnings | `client.paymentDunnings` | Debt recovery (Serasa) |
+| Notifications | `client.notifications` | Notification settings |
+| Mobile Recharges | `client.mobilePhoneRecharges` | Cell phone top-ups |
 
-**Returns:** `Promise<AsaasPayment>`
+## Usage Examples
 
-### `client.payments.list(customerId, options?)`
-
-List payments for a customer.
+### Payments
 
 ```typescript
-const payments = await client.payments.list("cus_123456", {
-  status: "PENDING",
-  limit: 10,
-  offset: 0,
+// List payments with filters
+const { data: payments, hasMore } = await client.payments.list({
+  customer: "cus_xxx",
+  status: AsaasPaymentStatus.PENDING,
+  "dueDate[ge]": "2025-01-01",
+  limit: 50,
 });
+
+// Refund a payment (full or partial)
+await client.payments.refund("pay_xxx", 50.0, "Partial refund");
+
+// Confirm cash receipt
+await client.payments.receiveInCash("pay_xxx", "2025-06-01", 100.0);
 ```
 
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-- `options` (object, optional): Filter options
-  - `status` (string): Filter by status
-  - `limit` (number): Maximum number of results
-  - `offset` (number): Pagination offset
-  - Additional options in `AsaasListPaymentsOptions` type
-
-**Returns:** `Promise<AsaasPayment[]>`
-
-### `client.payments.getLatest(customerId)`
-
-Get the latest payment for a customer.
+### Subscriptions
 
 ```typescript
-const payment = await client.payments.getLatest("cus_123456");
+import { AsaasSubscriptionCycle } from "@gusnips/asaas";
+
+const subscription = await client.subscriptions.create({
+  customer: "cus_xxx",
+  billingType: AsaasBillingType.CREDIT_CARD,
+  cycle: AsaasSubscriptionCycle.MONTHLY,
+  value: 49.9,
+  nextDueDate: "2025-07-01",
+});
+
+// List subscription payments
+const { data: payments } = await client.subscriptions.listPayments(subscription.id);
 ```
 
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-
-**Returns:** `Promise<AsaasPayment | null>`
-
-### `client.payments.getOverdue(customerId, limit?, offset?)`
-
-Get all overdue payments for a customer.
+### Transfers
 
 ```typescript
-const overduePayments = await client.payments.getOverdue("cus_123456", 100, 0);
-```
+// Transfer via PIX key
+const transfer = await client.transfers.create({
+  value: 500.0,
+  pixAddressKey: "email@example.com",
+  description: "Payment to supplier",
+});
 
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-- `limit` (number, optional): Maximum number of results (default: 100)
-- `offset` (number, optional): Pagination offset (default: 0)
-
-**Returns:** `Promise<AsaasPayment[]>`
-
-### `client.payments.getBillingInfo(paymentId)`
-
-Get billing information for a payment.
-
-```typescript
-const billingInfo = await client.payments.getBillingInfo("pay_123456");
-```
-
-**Parameters:**
-
-- `paymentId` (string, required): Payment ID
-
-**Returns:** `Promise<AsaasPaymentBillingInfo>`
-
-### `client.payments.getBoleto(paymentId)`
-
-Get boleto information for a payment.
-
-```typescript
-const boleto = await client.payments.getBoleto("pay_123456");
-// Returns: { barCode, identificationField, nossoNumero }
-```
-
-**Parameters:**
-
-- `paymentId` (string, required): Payment ID
-
-**Returns:** `Promise<AsaasBoletoInfo>`
-
-### `client.payments.getPixQrCode(paymentId)`
-
-Get PIX QR code for a payment.
-
-```typescript
-const pixQrCode = await client.payments.getPixQrCode("pay_123456");
-// Returns: { encodedImage, payload, expirationDate }
-```
-
-**Parameters:**
-
-- `paymentId` (string, required): Payment ID
-
-**Returns:** `Promise<AsaasPixQrCode>`
-
-### `client.payments.tokenizeCreditCard(data)`
-
-Tokenize a credit card for future use.
-
-```typescript
-const token = await client.payments.tokenizeCreditCard({
-  customer: "cus_123456",
-  creditCard: {
-    holderName: "John Doe",
-    number: "4111111111111111",
-    expiryMonth: "12",
-    expiryYear: "2028",
-    ccv: "123",
-  },
-  creditCardHolderInfo: {
-    name: "John Doe",
-    email: "john@example.com",
+// Transfer to bank account
+const bankTransfer = await client.transfers.create({
+  value: 1000.0,
+  operationType: AsaasTransferType.TED,
+  bankAccount: {
+    bank: { code: "237" },
+    ownerName: "Jane Doe",
     cpfCnpj: "12345678901",
-    postalCode: "12345-678",
-    addressNumber: "123",
+    agency: "1234",
+    account: "567890",
+    accountDigit: "1",
   },
-  remoteIp: "192.168.1.1",
 });
 ```
 
-**Parameters:**
-
-- `data` (object, required): Credit card tokenization data (see `AsaasCreditCardTokenizationRequest`)
-
-**Returns:** `Promise<AsaasCreditCardToken>`
-
-### `client.payments.createPaymentLink(data)`
-
-Create a payment link.
+### Finance
 
 ```typescript
-const paymentLink = await client.payments.createPaymentLink({
-  name: "Product Payment",
-  chargeType: "DETACHED",
-  billingType: "CREDIT_CARD",
-  value: 99.9,
+// Get account balance
+const { balance } = await client.finance.getBalance();
+
+// Get financial extract
+const { data: transactions } = await client.finance.getExtract({
+  startDate: "2025-01-01",
+  finishDate: "2025-01-31",
 });
 ```
 
-**Parameters:**
-
-- `data` (object, required): Payment link data
-
-**Returns:** `Promise<any>`
-
-### `client.payments.createProrated(customerId, subscriptionId, amount, description, paymentMethod, externalReference?)`
-
-Create a prorated payment.
+### Webhooks
 
 ```typescript
-const payment = await client.payments.createProrated(
-  "cus_123456",
-  "sub_123456",
-  5000, // Amount in cents
-  "Prorated payment for plan upgrade",
-  { type: "CREDIT_CARD", creditCardToken: "tok_123456" }
-);
-```
+import { AsaasWebhookSendType } from "@gusnips/asaas";
 
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-- `subscriptionId` (string, required): Subscription ID
-- `amount` (number, required): Amount in cents
-- `description` (string, required): Payment description
-- `paymentMethod` (object, required): Payment method configuration
-- `externalReference` (string, optional): External reference ID
-
-**Returns:** `Promise<AsaasPayment>`
-
-### `client.payments.cancel(paymentId)`
-
-Cancel a payment.
-
-```typescript
-const payment = await client.payments.cancel("pay_123456");
-```
-
-**Parameters:**
-
-- `paymentId` (string, required): Payment ID
-
-**Returns:** `Promise<AsaasPayment>`
-
-### `client.payments.cancelOpenInvoices(customerId, excludePaymentId?)`
-
-Cancel all open invoices for a customer.
-
-```typescript
-const canceledIds = await client.payments.cancelOpenInvoices(
-  "cus_123456",
-  "pay_exclude"
-);
-```
-
-**Parameters:**
-
-- `customerId` (string, required): Customer ID
-- `excludePaymentId` (string, optional): Payment ID to exclude from cancellation
-
-**Returns:** `Promise<string[]>` - Array of canceled payment IDs
-
-### `client.payments.listAllOverdue(limit?, offset?)`
-
-List all overdue payments (not filtered by customer).
-
-```typescript
-const overduePayments = await client.payments.listAllOverdue(100, 0);
-```
-
-**Parameters:**
-
-- `limit` (number, optional): Maximum number of results (default: 100)
-- `offset` (number, optional): Pagination offset (default: 0)
-
-**Returns:** `Promise<AsaasPayment[]>`
-
----
-
-## Accounts Module
-
-Manage sub-accounts, wallets, and commercial information.
-
-### `client.accounts.createSubAccount(data)`
-
-Create a sub-account.
-
-```typescript
-const subAccount = await client.accounts.createSubAccount({
-  name: "Partner Store",
-  email: "partner@store.com",
-  cpfCnpj: "12345678000199",
-  companyType: "LIMITED",
-  mobilePhone: "11987654321",
-  address: "Main Street",
-  addressNumber: "123",
-  province: "Downtown",
-  postalCode: "12345-678",
-  incomeValue: 10000,
+await client.webhooks.create({
+  name: "Payment Events",
+  url: "https://myapp.com/webhooks/asaas",
+  email: "dev@myapp.com",
+  enabled: true,
+  interrupted: false,
+  apiVersion: 3,
+  authToken: "your_auth_token_min_32_chars_long_here",
+  sendType: AsaasWebhookSendType.SEQUENTIALLY,
+  events: ["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED"],
 });
 ```
 
-**Parameters:**
-
-- `data` (object, required): Sub-account data (see `AsaasSubAccountRequest`)
-
-**Returns:** `Promise<AsaasSubAccount>`
-
-### `client.accounts.retrieveSubAccount(subAccountId)`
-
-Retrieve a sub-account by ID.
+### Invoices (Nota Fiscal)
 
 ```typescript
-const subAccount = await client.accounts.retrieveSubAccount("acc_123456");
-```
-
-**Parameters:**
-
-- `subAccountId` (string, required): Sub-account ID
-
-**Returns:** `Promise<AsaasSubAccount>`
-
-### `client.accounts.updateSubAccount(subAccountId, data)`
-
-Update a sub-account.
-
-```typescript
-const subAccount = await client.accounts.updateSubAccount("acc_123456", {
-  name: "Updated Store Name",
-  mobilePhone: "11999999999",
+const invoice = await client.invoices.create({
+  payment: "pay_xxx",
+  serviceDescription: "Software development services",
+  observations: "Monthly invoice",
+  value: 5000,
+  deductions: 0,
+  effectiveDate: "2025-06-15",
+  municipalServiceName: "Systems analysis and development",
+  taxes: {
+    retainIss: false,
+    iss: 2,
+    pis: 0.65,
+    cofins: 3,
+    csll: 1,
+    inss: 0,
+    ir: 1.5,
+  },
 });
+
+// Issue the invoice
+await client.invoices.authorize(invoice.id);
 ```
-
-**Parameters:**
-
-- `subAccountId` (string, required): Sub-account ID
-- `data` (object, required): Sub-account data to update
-
-**Returns:** `Promise<AsaasSubAccount>`
-
-### `client.accounts.listSubAccounts(options?)`
-
-List all sub-accounts.
-
-```typescript
-const subAccounts = await client.accounts.listSubAccounts({
-  limit: 10,
-  offset: 0,
-});
-```
-
-**Parameters:**
-
-- `options` (object, optional): Pagination options
-  - `limit` (number): Maximum number of results
-  - `offset` (number): Pagination offset
-
-**Returns:** `Promise<AsaasSubAccount[]>`
-
-### `client.accounts.getWallets()`
-
-Get wallets for the account.
-
-```typescript
-const wallets = await client.accounts.getWallets();
-```
-
-**Returns:** `Promise<AsaasWalletsResponse>`
-
-### `client.accounts.getCommercialInfo()`
-
-Get commercial information for the account.
-
-```typescript
-const commercialInfo = await client.accounts.getCommercialInfo();
-```
-
-**Returns:** `Promise<AsaasCommercialInfo>`
-
----
-
-## Type Definitions
-
-The SDK provides comprehensive TypeScript type definitions for all API entities:
-
-### Common Types
-
-- `AsaasBillingType` - Payment method types
-- `AsaasDiscountType` - Discount types
-- `AsaasEnvironment` - Environment types
-- `AsaasApiError` - Error class
-- `AsaasApiPaginatedResponse<T>` - Paginated response wrapper
-
-### Customer Types
-
-- `AsaasCustomer` - Customer entity
-
-### Subscription Types
-
-- `AsaasSubscription` - Subscription entity
-- `AsaasSubscriptionCycle` - Billing cycles
-- `AsaasSubscriptionStatus` - Subscription statuses
-- `AsaasSubscriptionRequest` - Create/update request
-- `AsaasSplit` - Split configuration
-
-### Payment Types
-
-- `AsaasPayment` - Payment entity
-- `AsaasPaymentStatus` - Payment statuses
-- `AsaasPaymentBillingInfo` - Billing information
-- `AsaasPixQrCode` - PIX QR code data
-- `AsaasBoletoInfo` - Boleto information
-- `AsaasCreditCardToken` - Tokenized credit card
-- `AsaasListPaymentsOptions` - Payment list filters
-
-### Account Types
-
-- `AsaasSubAccount` - Sub-account entity
-- `AsaasSubAccountRequest` - Sub-account creation
-- `AsaasWalletsResponse` - Wallet information
-- `AsaasCommercialInfo` - Commercial information
-- `AsaasPersonType` - Person types
-- `AsaasCompanyType` - Company types
-
----
 
 ## Error Handling
 
-The SDK throws `AsaasApiError` for API errors:
+The SDK throws `AsaasApiError` for API errors with structured error information:
 
 ```typescript
 import { AsaasApiError } from "@gusnips/asaas";
 
 try {
-  const customer = await client.customers.create({
-    name: "John Doe",
-    email: "invalid-email",
-  });
+  await client.payments.create({ /* ... */ });
 } catch (error) {
   if (error instanceof AsaasApiError) {
-    console.error("Status:", error.status);
-    console.error("Message:", error.message);
-    console.error("Errors:", error.errors);
+    console.error(`Status: ${error.status}`);
+    console.error(`Message: ${error.message}`);
+    console.error(`Errors:`, error.errors);
+    // error.errors = [{ code: "invalid_customer", description: "..." }]
   }
 }
 ```
 
----
+## Environments
 
-## Development
+```typescript
+// Sandbox (for testing)
+const sandbox = new AsaasClient({
+  apiKey: "$aact_sandbox_key",
+  environment: "sandbox",
+});
 
-### Setup
-
-```bash
-# Install dependencies
-bun install
-
-# Run type checking
-bun run typecheck
-
-# Run linter
-bun run lint
-
-# Build the package
-bun run build
+// Production
+const production = new AsaasClient({
+  apiKey: "$aact_production_key",
+  environment: "production",
+});
 ```
 
-### Project Structure
+## Pagination
 
+All list methods return a paginated response:
+
+```typescript
+interface AsaasApiPaginatedResponse<T> {
+  data: T[];
+  totalCount: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+}
+
+// Iterate through pages
+let offset = 0;
+let hasMore = true;
+
+while (hasMore) {
+  const response = await client.payments.list({ offset, limit: 100 });
+  // process response.data
+  hasMore = response.hasMore;
+  offset += response.data.length;
+}
 ```
-src/
-├── client.ts           # Main client class
-├── index.ts            # Main export file
-├── modules/            # Domain modules
-│   ├── customers.ts
-│   ├── subscriptions.ts
-│   ├── payments.ts
-│   └── accounts.ts
-├── types/              # Type definitions
-│   ├── common.ts
-│   ├── customer.ts
-│   ├── subscription.ts
-│   ├── payment.ts
-│   ├── account.ts
-│   └── index.ts
-└── utils/              # Utilities
-    └── client.ts       # HTTP client configuration
+
+## Advanced Usage
+
+Access the underlying Axios instance for custom requests:
+
+```typescript
+const httpClient = client.getHttpClient();
+const response = await httpClient.get("/some/custom/endpoint");
 ```
 
----
+## Requirements
 
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Follow the existing code style
-2. Use DRY principles
-3. Create modular, reusable, and maintainable code
-4. Reuse existing patterns
-5. Never change code unrelated to the task
-6. Add tests for new features
-
----
+- TypeScript >= 5.0
+- Node.js >= 18 (or Bun/Deno with npm compatibility)
 
 ## License
 
 MIT
-
----
-
-## Links
-
-- [Asaas API Documentation](https://docs.asaas.com/)
-- [GitHub Repository](https://github.com/gusnips/asaas)
-- [NPM Package](https://www.npmjs.com/package/@gusnips/asaas)

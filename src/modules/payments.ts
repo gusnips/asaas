@@ -5,15 +5,15 @@
 import { AxiosInstance } from "axios";
 import {
   AsaasPayment,
+  AsaasPaymentCreateRequest,
   AsaasPaymentBillingInfo,
   AsaasBoletoInfo,
   AsaasPixQrCode,
   AsaasCreditCardToken,
+  AsaasCreditCardTokenizationRequest,
   AsaasListPaymentsOptions,
   AsaasApiPaginatedResponse,
-  AsaasPaymentStatus,
-  AsaasCreditCardTokenizationRequest,
-  AsaasBillingType,
+  AsaasDeleteResponse,
 } from "../types/index.ts";
 
 export class PaymentsModule {
@@ -21,282 +21,266 @@ export class PaymentsModule {
 
   /**
    * Create a payment
-   * @param paymentData The payment data
+   * @param data The payment data
    * @returns The created payment
    */
-  async create(paymentData: Partial<AsaasPayment>): Promise<AsaasPayment> {
-    const response = await this.client.post<AsaasPayment>(
-      "/payments",
-      paymentData
-    );
+  async create(data: AsaasPaymentCreateRequest): Promise<AsaasPayment> {
+    const response = await this.client.post<AsaasPayment>("/payments", data);
     return response.data;
   }
 
   /**
-   * Retrieve a payment
-   * @param paymentId The payment ID
+   * Retrieve a payment by ID
+   * @param id The payment ID
    * @returns The payment
    */
-  async retrieve(paymentId: string): Promise<AsaasPayment> {
-    const response = await this.client.get<AsaasPayment>(
-      `/payments/${paymentId}`
-    );
+  async retrieve(id: string): Promise<AsaasPayment> {
+    const response = await this.client.get<AsaasPayment>(`/payments/${id}`);
     return response.data;
   }
 
   /**
    * Update a payment
-   * @param paymentId The payment ID
-   * @param paymentData The payment data
+   * @param id The payment ID
+   * @param data The payment data to update
    * @returns The updated payment
    */
   async update(
-    paymentId: string,
-    paymentData: Partial<AsaasPayment>
+    id: string,
+    data: Partial<AsaasPaymentCreateRequest>
   ): Promise<AsaasPayment> {
-    const response = await this.client.post<AsaasPayment>(
-      `/payments/${paymentId}`,
-      paymentData
+    const response = await this.client.put<AsaasPayment>(
+      `/payments/${id}`,
+      data
     );
     return response.data;
   }
 
   /**
-   * List payments for a customer
-   * @param customerId The customer ID
-   * @param options The options for the request
-   * @returns Array of payments
+   * Delete a payment
+   * @param id The payment ID
+   * @returns The delete response
+   */
+  async delete(id: string): Promise<AsaasDeleteResponse> {
+    const response = await this.client.delete<AsaasDeleteResponse>(
+      `/payments/${id}`
+    );
+    return response.data;
+  }
+
+  /**
+   * Restore a removed payment
+   * @param id The payment ID
+   * @returns The restored payment
+   */
+  async restore(id: string): Promise<AsaasPayment> {
+    const response = await this.client.post<AsaasPayment>(
+      `/payments/${id}/restore`
+    );
+    return response.data;
+  }
+
+  /**
+   * List payments with optional filters
+   * @param params Filter and pagination parameters
+   * @returns Paginated list of payments
    */
   async list(
-    customerId: string,
-    options: AsaasListPaymentsOptions = {}
-  ): Promise<AsaasPayment[]> {
+    params: AsaasListPaymentsOptions = {}
+  ): Promise<AsaasApiPaginatedResponse<AsaasPayment>> {
     const response = await this.client.get<
       AsaasApiPaginatedResponse<AsaasPayment>
-    >("/payments", {
-      params: { customer: customerId, ...options },
-    });
-    return response.data.data || [];
+    >("/payments", { params });
+    return response.data;
   }
 
   /**
-   * Get the latest payment for a customer
-   * @param customerId The customer ID
-   * @returns The latest payment or null
+   * Get the status of a payment
+   * @param id The payment ID
+   * @returns The payment status
    */
-  async getLatest(customerId: string): Promise<AsaasPayment | null> {
-    const payments = await this.list(customerId, {
-      limit: 1,
-      offset: 0,
-    });
-    return payments && payments.length > 0 ? payments[0] ?? null : null;
-  }
-
-  /**
-   * Get all overdue payments for a customer
-   * @param customerId The customer ID
-   * @param limit Maximum number of payments to return
-   * @param offset Offset for pagination
-   * @returns Array of overdue payments
-   */
-  async getOverdue(
-    customerId: string,
-    limit: number = 100,
-    offset: number = 0
-  ): Promise<AsaasPayment[]> {
-    const payments = await this.list(customerId, {
-      status: AsaasPaymentStatus.OVERDUE,
-      limit,
-      offset,
-    });
-    return payments || [];
-  }
-
-  /**
-   * Get the billing info for a payment
-   * @param paymentId The payment ID
-   * @returns The billing info
-   */
-  async getBillingInfo(paymentId: string): Promise<AsaasPaymentBillingInfo> {
-    const response = await this.client.get<AsaasPaymentBillingInfo>(
-      `/payments/${paymentId}/billingInfo`
+  async getStatus(id: string): Promise<{ status: string }> {
+    const response = await this.client.get<{ status: string }>(
+      `/payments/${id}/status`
     );
     return response.data;
   }
 
   /**
-   * Get boleto information for a payment
-   * @param paymentId The payment ID
-   * @returns The boleto info
+   * Refund a payment
+   * @param id The payment ID
+   * @param value Optional partial refund value
+   * @param description Optional refund description
+   * @returns The refunded payment
    */
-  async getBoleto(paymentId: string): Promise<AsaasBoletoInfo> {
-    const response = await this.client.get<AsaasBoletoInfo>(
-      `/payments/${paymentId}/identificationField`
+  async refund(
+    id: string,
+    value?: number,
+    description?: string
+  ): Promise<AsaasPayment> {
+    const response = await this.client.post<AsaasPayment>(
+      `/payments/${id}/refund`,
+      { value, description }
     );
     return response.data;
   }
 
   /**
-   * Get PIX QR code for a payment
-   * @param paymentId The payment ID
-   * @returns The PIX QR code
+   * Capture a pre-authorized payment
+   * @param id The payment ID
+   * @returns The captured payment
    */
-  async getPixQrCode(paymentId: string): Promise<AsaasPixQrCode> {
-    const response = await this.client.get<AsaasPixQrCode>(
-      `/payments/${paymentId}/pixQrCode`
+  async capturePreAuthorized(id: string): Promise<AsaasPayment> {
+    const response = await this.client.post<AsaasPayment>(
+      `/payments/${id}/captureAuthorizedPayment`
     );
     return response.data;
   }
 
   /**
-   * Tokenize a credit card
-   * @param creditCardData The credit card data
-   * @returns The credit card token
+   * Pay a charge with a credit card
+   * @param id The payment ID
+   * @param creditCardData Credit card or token data
+   * @returns The payment
    */
-  async tokenizeCreditCard(
-    creditCardData: AsaasCreditCardTokenizationRequest
-  ): Promise<AsaasCreditCardToken> {
-    const response = await this.client.post<AsaasCreditCardToken>(
-      "/creditCard/tokenize",
+  async payWithCreditCard(
+    id: string,
+    creditCardData: Record<string, unknown>
+  ): Promise<AsaasPayment> {
+    const response = await this.client.post<AsaasPayment>(
+      `/payments/${id}/payWithCreditCard`,
       creditCardData
     );
     return response.data;
   }
 
   /**
-   * Create a payment link
-   * @param paymentLinkData The payment link data
-   * @returns The created payment link
+   * Confirm cash receipt for a payment
+   * @param id The payment ID
+   * @param paymentDate The date payment was received
+   * @param value The value received
+   * @returns The payment
    */
-  async createPaymentLink(
-    paymentLinkData: Record<string, unknown>
-  ): Promise<Record<string, unknown>> {
-    const response = await this.client.post<Record<string, unknown>>(
-      "/paymentLinks",
-      paymentLinkData
-    );
-    return response.data;
-  }
-
-  /**
-   * Create a prorated payment
-   * @param customerId The customer ID
-   * @param subscriptionId The subscription ID
-   * @param proratedAmount The prorated amount in cents
-   * @param description The payment description
-   * @param paymentMethod The payment method
-   * @param customExternalReference Optional external reference
-   * @returns The created payment
-   */
-  async createProrated(
-    customerId: string,
-    subscriptionId: string,
-    proratedAmount: number,
-    description: string,
-    paymentMethod: {
-      type: string;
-      creditCardToken?: string;
-    },
-    customExternalReference?: string | null
+  async receiveInCash(
+    id: string,
+    paymentDate: string,
+    value: number
   ): Promise<AsaasPayment> {
-    const paymentData: Partial<AsaasPayment> & { creditCardToken?: string } = {
-      customer: customerId,
-      value: proratedAmount / 100, // Convert cents to reais
-      dueDate: new Date().toISOString().split("T")[0] || "", // Today
-      description,
-      externalReference:
-        customExternalReference || `prorated_${subscriptionId}`,
-      billingType: paymentMethod.type as AsaasBillingType,
-    };
-
-    // Add credit card token if applicable
-    if (paymentMethod.type === "CREDIT_CARD" && paymentMethod.creditCardToken) {
-      paymentData.creditCardToken = paymentMethod.creditCardToken;
-    }
-
     const response = await this.client.post<AsaasPayment>(
-      "/payments",
-      paymentData
+      `/payments/${id}/receiveInCash`,
+      { paymentDate, value }
     );
     return response.data;
   }
 
   /**
-   * Cancel or delete an open payment (invoice)
-   * @param paymentId The ID of the payment to cancel
-   * @returns The canceled payment
+   * Undo cash receipt confirmation
+   * @param id The payment ID
+   * @returns The payment
    */
-  async cancel(paymentId: string): Promise<AsaasPayment> {
-    const response = await this.client.delete<AsaasPayment>(
-      `/payments/${paymentId}`
+  async undoReceivedInCash(id: string): Promise<AsaasPayment> {
+    const response = await this.client.post<AsaasPayment>(
+      `/payments/${id}/undoReceivedInCash`
     );
     return response.data;
   }
 
   /**
-   * Cancels all open invoices for a customer
-   * Only cancels invoices that are not yet due or paid
-   * @param customerId The customer ID
-   * @param excludePaymentId Optional payment ID to exclude from cancellation
-   * @returns Array of canceled payment IDs
+   * Get billing info for a payment
+   * @param id The payment ID
+   * @returns The billing info
    */
-  async cancelOpenInvoices(
-    customerId: string,
-    excludePaymentId?: string
-  ): Promise<string[]> {
-    // Get all open payments for the customer
-    const openPayments = await this.list(customerId, {
-      status: AsaasPaymentStatus.PENDING,
-    });
-
-    const canceledPaymentIds: string[] = [];
-
-    // Cancel each payment that's not yet due and not the excluded payment
-    for (const payment of openPayments) {
-      // Skip the payment we want to exclude (like a plan change payment)
-      if (excludePaymentId && payment.id === excludePaymentId) {
-        continue;
-      }
-
-      // Only cancel payments that are in the future (not overdue)
-      const dueDate = new Date(payment.dueDate);
-      const today = new Date();
-
-      if (
-        dueDate >= today &&
-        ![
-          AsaasPaymentStatus.RECEIVED,
-          AsaasPaymentStatus.CONFIRMED,
-          AsaasPaymentStatus.REFUNDED,
-        ].includes(payment.status)
-      ) {
-        await this.cancel(payment.id);
-        canceledPaymentIds.push(payment.id);
-      }
-    }
-
-    return canceledPaymentIds;
+  async getBillingInfo(id: string): Promise<AsaasPaymentBillingInfo> {
+    const response = await this.client.get<AsaasPaymentBillingInfo>(
+      `/payments/${id}/billingInfo`
+    );
+    return response.data;
   }
 
   /**
-   * List all overdue payments (not filtered by customer)
-   * @param limit Maximum number of results
-   * @param offset Pagination offset
-   * @returns Array of overdue payments
+   * Get the digitable bill line (boleto)
+   * @param id The payment ID
+   * @returns The boleto info
    */
-  async listAllOverdue(
-    limit: number = 100,
-    offset: number = 0
-  ): Promise<AsaasPayment[]> {
-    const response = await this.client.get<
-      AsaasApiPaginatedResponse<AsaasPayment>
-    >("/payments", {
-      params: {
-        status: AsaasPaymentStatus.OVERDUE,
-        limit,
-        offset,
-      },
-    });
-    return response.data.data || [];
+  async getIdentificationField(id: string): Promise<AsaasBoletoInfo> {
+    const response = await this.client.get<AsaasBoletoInfo>(
+      `/payments/${id}/identificationField`
+    );
+    return response.data;
+  }
+
+  /**
+   * Get PIX QR code for a payment
+   * @param id The payment ID
+   * @returns The PIX QR code
+   */
+  async getPixQrCode(id: string): Promise<AsaasPixQrCode> {
+    const response = await this.client.get<AsaasPixQrCode>(
+      `/payments/${id}/pixQrCode`
+    );
+    return response.data;
+  }
+
+  /**
+   * Tokenize a credit card
+   * @param data The credit card data
+   * @returns The credit card token
+   */
+  async tokenizeCreditCard(
+    data: AsaasCreditCardTokenizationRequest
+  ): Promise<AsaasCreditCardToken> {
+    const response = await this.client.post<AsaasCreditCardToken>(
+      "/creditCard/tokenizeCreditCard",
+      data
+    );
+    return response.data;
+  }
+
+  /**
+   * Simulate a payment
+   * @param data Simulation parameters
+   * @returns Simulation result
+   */
+  async simulate(data: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const response = await this.client.post<Record<string, unknown>>(
+      "/payments/simulate",
+      data
+    );
+    return response.data;
+  }
+
+  /**
+   * Get payment limits
+   * @returns Payment limits
+   */
+  async getLimits(): Promise<Record<string, unknown>> {
+    const response = await this.client.get<Record<string, unknown>>(
+      "/payments/limits"
+    );
+    return response.data;
+  }
+
+  /**
+   * Get refunds for a payment
+   * @param id The payment ID
+   * @returns Array of refunds
+   */
+  async getRefunds(id: string): Promise<Record<string, unknown>> {
+    const response = await this.client.get<Record<string, unknown>>(
+      `/payments/${id}/refunds`
+    );
+    return response.data;
+  }
+
+  /**
+   * Get viewing info for a payment
+   * @param id The payment ID
+   * @returns Viewing info
+   */
+  async getViewingInfo(id: string): Promise<Record<string, unknown>> {
+    const response = await this.client.get<Record<string, unknown>>(
+      `/payments/${id}/viewingInfo`
+    );
+    return response.data;
   }
 }

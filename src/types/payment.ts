@@ -21,6 +21,9 @@ export enum AsaasPaymentStatus {
   AWAITING_CHARGEBACK_REVERSAL = "AWAITING_CHARGEBACK_REVERSAL",
   CANCELLED = "CANCELLED",
   CHARGEBACK = "CHARGEBACK",
+  DUNNING_REQUESTED = "DUNNING_REQUESTED",
+  DUNNING_RECEIVED = "DUNNING_RECEIVED",
+  AWAITING_RISK_ANALYSIS = "AWAITING_RISK_ANALYSIS",
 }
 
 /**
@@ -71,6 +74,7 @@ export interface AsaasPayment {
   id: string;
   dateCreated?: string;
   customer: string;
+  checkoutSession?: string;
   subscription?: string;
   installment?: string;
   paymentLink?: string;
@@ -176,13 +180,67 @@ export interface AsaasPaymentBillingInfo {
  * Options for listing payments
  */
 export interface AsaasListPaymentsOptions {
-  limit?: number;
   offset?: number;
+  limit?: number;
+  customer?: string;
+  customerGroupName?: string;
   billingType?: AsaasBillingType;
   status?: AsaasPaymentStatus;
+  subscription?: string;
+  installment?: string;
+  externalReference?: string;
   paymentDate?: string;
   invoiceStatus?: AsaasInvoiceStatus;
-  subscription?: string;
+  estimatedCreditDate?: string;
+  pixQrCodeId?: string;
+  anticipated?: boolean;
+  anticipable?: boolean;
+  "dateCreated[ge]"?: string;
+  "dateCreated[le]"?: string;
+  "paymentDate[ge]"?: string;
+  "paymentDate[le]"?: string;
+  "estimatedCreditDate[ge]"?: string;
+  "estimatedCreditDate[le]"?: string;
+  "dueDate[ge]"?: string;
+  "dueDate[le]"?: string;
+  user?: string;
+  checkoutSession?: string;
+}
+
+/**
+ * Request interface for creating a payment
+ */
+export interface AsaasPaymentCreateRequest {
+  customer: string;
+  billingType: AsaasBillingType;
+  value: number;
+  dueDate: string;
+  description?: string;
+  daysAfterDueDateToRegistrationCancellation?: number;
+  externalReference?: string;
+  installmentCount?: number;
+  totalValue?: number;
+  installmentValue?: number;
+  discount?: {
+    value?: number;
+    dueDateLimitDays?: number;
+    type?: "FIXED" | "PERCENTAGE";
+  };
+  interest?: { value?: number };
+  fine?: { value?: number; type?: "FIXED" | "PERCENTAGE" };
+  postalService?: boolean;
+  split?: Array<{
+    walletId: string;
+    fixedValue?: number;
+    percentualValue?: number;
+    totalFixedValue?: number;
+    externalReference?: string;
+    description?: string;
+  }>;
+  callback?: {
+    successUrl: string;
+    autoRedirect?: boolean;
+  };
 }
 
 /**

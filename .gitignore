@@ -17,6 +17,7 @@ dist/
 *.swo
 *~
 .DS_Store
+.kiro
 
 # Logs
 *.log

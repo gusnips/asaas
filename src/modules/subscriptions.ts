@@ -4,170 +4,129 @@
 
 import { AxiosInstance } from "axios";
 import {
+  AsaasPayment,
   AsaasSubscription,
   AsaasSubscriptionRequest,
-  AsaasSubscriptionStatus,
+  AsaasSubscriptionUpdateRequest,
+  AsaasListSubscriptionsParams,
   AsaasApiPaginatedResponse,
   AsaasDeleteResponse,
 } from "../types/index.ts";
 
-/**
- * Calculate next due date for subscription reactivation
- */
-function calculateNextDueDateForReactivation(cycle: string): string {
-  const today = new Date();
-  const nextDate = new Date(today);
-
-  switch (cycle) {
-    case "WEEKLY":
-      nextDate.setDate(today.getDate() + 7);
-      break;
-    case "BIWEEKLY":
-      nextDate.setDate(today.getDate() + 14);
-      break;
-    case "MONTHLY":
-      nextDate.setMonth(today.getMonth() + 1);
-      break;
-    case "BIMONTHLY":
-      nextDate.setMonth(today.getMonth() + 2);
-      break;
-    case "QUARTERLY":
-      nextDate.setMonth(today.getMonth() + 3);
-      break;
-    case "SEMIANNUALLY":
-      nextDate.setMonth(today.getMonth() + 6);
-      break;
-    case "YEARLY":
-      nextDate.setFullYear(today.getFullYear() + 1);
-      break;
-    default:
-      nextDate.setMonth(today.getMonth() + 1);
-  }
-
-  return nextDate.toISOString().split("T")[0] || "";
-}
-
 export class SubscriptionsModule {
-  constructor(private client: AxiosInstance) { }
+  constructor(private client: AxiosInstance) {}
 
   /**
-   * Retrieve a subscription
-   * @param subscriptionId The subscription ID
-   * @returns The subscription
+   * Create a subscription
+   * @param data The subscription data
+   * @returns The created subscription
    */
-  async retrieve(subscriptionId: string): Promise<AsaasSubscription> {
-    const response = await this.client.get<AsaasSubscription>(
-      `/subscriptions/${subscriptionId}`
+  async create(
+    data: Partial<AsaasSubscriptionRequest>
+  ): Promise<AsaasSubscription> {
+    const response = await this.client.post<AsaasSubscription>(
+      "/subscriptions",
+      data
     );
     return response.data;
   }
 
   /**
-   * List subscriptions for a customer
-   * @param customerId The customer ID (optional)
-   * @param status The status of the subscriptions
-   * @returns Array of subscriptions
+   * Retrieve a subscription by ID
+   * @param id The subscription ID
+   * @returns The subscription
    */
-  async list(
-    customerId?: string,
-    status?: AsaasSubscriptionStatus
-  ): Promise<AsaasSubscription[]> {
-    const params: Record<string, string> = {};
-    if (customerId) {
-      params.customer = customerId;
-    }
-    if (status) {
-      params.status = status;
-    }
-
-    const response = await this.client.get<
-      AsaasApiPaginatedResponse<AsaasSubscription>
-    >("/subscriptions", { params });
-    return response.data.data || [];
-  }
-
-  /**
-   * Create a subscription
-   * @param subscriptionData The subscription data
-   * @returns The created subscription
-   */
-  async create(
-    subscriptionData: Partial<AsaasSubscription>
-  ): Promise<AsaasSubscription> {
-    const response = await this.client.post<AsaasSubscription>(
-      "/subscriptions",
-      subscriptionData
+  async retrieve(id: string): Promise<AsaasSubscription> {
+    const response = await this.client.get<AsaasSubscription>(
+      `/subscriptions/${id}`
     );
     return response.data;
   }
 
   /**
    * Update a subscription
-   * @param subscriptionId The subscription ID
-   * @param subscriptionData The subscription data
+   * @param id The subscription ID
+   * @param data The subscription data to update
    * @returns The updated subscription
    */
   async update(
-    subscriptionId: string,
-    subscriptionData: Partial<AsaasSubscriptionRequest>
+    id: string,
+    data: Partial<AsaasSubscriptionUpdateRequest>
   ): Promise<AsaasSubscription> {
-    const response = await this.client.post<AsaasSubscription>(
-      `/subscriptions/${subscriptionId}`,
-      subscriptionData
+    const response = await this.client.put<AsaasSubscription>(
+      `/subscriptions/${id}`,
+      data
     );
     return response.data;
   }
 
   /**
-   * Reactivate a subscription
-   * @param subscriptionId The subscription ID
-   * @param subscriptionData The subscription data
-   * @returns The reactivated subscription
-   */
-  async reactivate(
-    subscriptionId: string,
-    subscriptionData?: Partial<AsaasSubscriptionRequest>
-  ): Promise<AsaasSubscription> {
-    // First get the subscription to determine its cycle
-    const subscription = await this.retrieve(subscriptionId);
-    const nextDueDate = calculateNextDueDateForReactivation(subscription.cycle);
-
-    // In Asaas API, reactivation is done by updating status to ACTIVE with nextDueDate
-    const response = await this.client.post<AsaasSubscription>(
-      `/subscriptions/${subscriptionId}`,
-      {
-        status: AsaasSubscriptionStatus.ACTIVE,
-        nextDueDate,
-        ...(subscriptionData || {}),
-      }
-    );
-    return response.data;
-  }
-
-  /**
-   * Cancel a subscription
-   * @param subscriptionId The subscription ID
-   * @returns The canceled subscription
-   */
-  async cancel(subscriptionId: string): Promise<AsaasSubscription> {
-    // In Asaas API, cancellation is done by updating status to INACTIVE
-    const response = await this.client.post<AsaasSubscription>(
-      `/subscriptions/${subscriptionId}`,
-      {
-        status: AsaasSubscriptionStatus.INACTIVE,
-      }
-    );
-    return response.data;
-  }
-
-  /**
-   * Delete a subscription
-   * @param subscriptionId The subscription ID
+   * Delete (remove) a subscription
+   * @param id The subscription ID
    * @returns The delete response
    */
-  async delete(subscriptionId: string): Promise<AsaasDeleteResponse> {
+  async delete(id: string): Promise<AsaasDeleteResponse> {
     const response = await this.client.delete<AsaasDeleteResponse>(
-      `/subscriptions/${subscriptionId}`
+      `/subscriptions/${id}`
+    );
+    return response.data;
+  }
+
+  /**
+   * List subscriptions with optional filters
+   * @param params Filter and pagination parameters
+   * @returns Paginated list of subscriptions
+   */
+  async list(
+    params: AsaasListSubscriptionsParams = {}
+  ): Promise<AsaasApiPaginatedResponse<AsaasSubscription>> {
+    const response = await this.client.get<
+      AsaasApiPaginatedResponse<AsaasSubscription>
+    >("/subscriptions", { params });
+    return response.data;
+  }
+
+  /**
+   * List payments of a subscription
+   * @param id The subscription ID
+   * @param params Pagination parameters
+   * @returns Paginated list of payments
+   */
+  async listPayments(
+    id: string,
+    params: { offset?: number; limit?: number; status?: string } = {}
+  ): Promise<AsaasApiPaginatedResponse<AsaasPayment>> {
+    const response = await this.client.get<
+      AsaasApiPaginatedResponse<AsaasPayment>
+    >(`/subscriptions/${id}/payments`, { params });
+    return response.data;
+  }
+
+  /**
+   * Update the credit card for a subscription without charging
+   * @param id The subscription ID
+   * @param creditCardData Credit card data
+   * @returns The updated subscription
+   */
+  async updateCreditCard(
+    id: string,
+    creditCardData: Record<string, unknown>
+  ): Promise<AsaasSubscription> {
+    const response = await this.client.put<AsaasSubscription>(
+      `/subscriptions/${id}/creditCard`,
+      creditCardData
+    );
+    return response.data;
+  }
+
+  /**
+   * Generate subscription payment booklet
+   * @param id The subscription ID
+   * @returns The booklet URL or data
+   */
+  async getPaymentBook(id: string): Promise<Record<string, unknown>> {
+    const response = await this.client.get<Record<string, unknown>>(
+      `/subscriptions/${id}/paymentBook`
     );
     return response.data;
   }

@@ -23,6 +23,7 @@ export enum AsaasSubscriptionCycle {
 export enum AsaasSubscriptionStatus {
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
+  EXPIRED = "EXPIRED",
 }
 
 /**
@@ -139,4 +140,21 @@ export interface AsaasSubscriptionUpdateRequest
   creditCardToken?: string;
   creditCard?: AsaasCreditCardObject;
   creditCardHolderInfo?: AsaasCreditCardHolderInfo;
+}
+
+/**
+ * Parameters for listing subscriptions
+ */
+export interface AsaasListSubscriptionsParams {
+  offset?: number;
+  limit?: number;
+  customer?: string;
+  customerGroupName?: string;
+  billingType?: AsaasBillingType;
+  status?: AsaasSubscriptionStatus;
+  deletedOnly?: boolean;
+  includeDeleted?: boolean;
+  externalReference?: string;
+  order?: string;
+  sort?: string;
 }

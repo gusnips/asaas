@@ -66,6 +66,14 @@ export enum AsaasDiscountType {
 }
 
 /**
+ * Fine type for Asaas
+ */
+export enum AsaasFineType {
+  FIXED = "FIXED",
+  PERCENTAGE = "PERCENTAGE",
+}
+
+/**
  * Environment type for Asaas API
  */
 export type AsaasEnvironment = "production" | "sandbox";

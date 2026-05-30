@@ -1,6 +1,6 @@
 {
   "name": "@gusnips/asaas",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Unofficial TypeScript SDK for Asaas API with domain-based architecture",
   "repository": {
     "type": "git",

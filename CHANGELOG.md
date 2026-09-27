@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [2.2.1] - 2026-09-27
 
 ### Documented
 
+- **Installments**: Asaas puts the leftover cent on the LAST installment, not the first as 2.2.0 said: 100 in 3 is 33.33, 33.33, 33.34 by installment number, on `POST /payments` and `POST /installments` alike. The 2.2.0 reading took the installments in the order Asaas lists them, which is last first. The docs now say to sort by `installmentNumber`.
 - **Payments**: on an installment charge, prefer `totalValue`. `installmentValue` alone is multiplied, so 33.33 in 3 charges 99.99, and sent beside `totalValue` it is ignored.
 
 ## [2.2.0] - 2026-09-27
@@ -12,7 +13,7 @@
 
 - **Installments**: `installments.create()` takes the amount either way Asaas does. `AsaasInstallmentCreateRequest` required `value`, which on this endpoint is ONE installment, so the plain "charge 300 in 3" request (`totalValue` alone) did not compile. It is now `totalValue`, `value`, or both, and a request with neither still does not compile (Asaas answers it with 400 `invalid_installmentValue`). Measured against the sandbox:
   - sent together, `totalValue` wins and `value` is ignored: 5 each with a total of 12 comes out 6 and 6;
-  - Asaas divides a total itself and puts the leftover cent on the FIRST installment: 100 in 3 is 33.34, 33.33, 33.33.
+  - Asaas divides a total itself and puts the leftover cent on the last installment: 100 in 3 is 33.33, 33.33, 33.34. (This line first said the first installment; corrected in 2.2.1.)
 - **Installments**: the create request now types the card fields Asaas takes on `POST /installments`: `creditCard`, `creditCardHolderInfo`, `creditCardToken` and `remoteIp`. Callers were adding them with local type extensions.
 
 ## [2.1.0] - 2026-09-27

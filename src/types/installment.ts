@@ -61,8 +61,10 @@ export interface AsaasInstallmentCreateBase {
  * takes either, and answers a request with neither with 400
  * `invalid_installmentValue`. Sent together, `totalValue` wins and `value` is
  * ignored: 5 each with a total of 12 comes out 6 and 6. Asaas divides a total
- * itself and puts the leftover cent on the FIRST installment: 100 in 3 is
- * 33.34, 33.33, 33.33. Measured in the sandbox, 2026-09-27.
+ * itself and puts the leftover cent on the LAST installment: 100 in 3 is
+ * 33.33, 33.33, 33.34. Measured in the sandbox, 2026-09-27. Listing them with
+ * `payments.list({ installment })` returns the last one first, so sort by
+ * `installmentNumber` before reading an order off them.
  */
 export type AsaasInstallmentCreateRequest = AsaasInstallmentCreateBase &
   ({ totalValue: number; value?: number } | { value: number; totalValue?: number });

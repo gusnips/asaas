@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Documented
+
+- **Payments**: on an installment charge, prefer `totalValue`. `installmentValue` alone is multiplied, so 33.33 in 3 charges 99.99, and sent beside `totalValue` it is ignored.
+
 ## [2.2.0] - 2026-09-27
 
 ### Fixed

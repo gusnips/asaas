@@ -266,6 +266,11 @@ export interface AsaasSinglePaymentCreateRequest extends AsaasPaymentCreateBase 
  * `installmentValue` for each installment. `value` is refused here, whatever
  * the count: Asaas answers 400 `invalid_installmentValue`.
  *
+ * Prefer `totalValue`. Asaas puts its leftover cent on the FIRST installment
+ * (100 in 3 is 33.34, 33.33, 33.33), while `installmentValue` alone is
+ * multiplied (33.33 in 3 charges 99.99). Sent together, `totalValue` wins and
+ * `installmentValue` is ignored. Measured in the sandbox, 2026-09-27.
+ *
  * On a card, every installment must be at least R$ 5,00.
  */
 export type AsaasInstallmentPaymentCreateRequest = AsaasPaymentCreateBase & {

@@ -105,7 +105,7 @@ async function installmentExamples() {
     customer: "cus_000005401844",
     billingType: AsaasBillingType.BOLETO,
     installmentCount: 3,
-    value: 100.0,
+    totalValue: 300.0, // the whole plan; `value` would be ONE installment
     dueDate: "2025-08-01",
     description: "Order #56789",
   });

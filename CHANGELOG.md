@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.2.0] - 2026-09-27
+
+### Fixed
+
+- **Installments**: `installments.create()` takes the amount either way Asaas does. `AsaasInstallmentCreateRequest` required `value`, which on this endpoint is ONE installment, so the plain "charge 300 in 3" request (`totalValue` alone) did not compile. It is now `totalValue`, `value`, or both, and a request with neither still does not compile (Asaas answers it with 400 `invalid_installmentValue`). Measured against the sandbox:
+  - sent together, `totalValue` wins and `value` is ignored: 5 each with a total of 12 comes out 6 and 6;
+  - Asaas divides a total itself and puts the leftover cent on the FIRST installment: 100 in 3 is 33.34, 33.33, 33.33.
+- **Installments**: the create request now types the card fields Asaas takes on `POST /installments`: `creditCard`, `creditCardHolderInfo`, `creditCardToken` and `remoteIp`. Callers were adding them with local type extensions.
+
 ## [2.1.0] - 2026-09-27
 
 ### Fixed

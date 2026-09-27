@@ -3,6 +3,7 @@
  */
 
 import { AsaasBillingType } from "./common.ts";
+import type { AsaasCreditCardTokenizationRequest } from "./payment.ts";
 
 export interface AsaasInstallment {
   object?: string;
@@ -23,13 +24,11 @@ export interface AsaasInstallment {
   deleted?: boolean;
 }
 
-export interface AsaasInstallmentCreateRequest {
+export interface AsaasInstallmentCreateBase {
   installmentCount: number;
   customer: string;
-  value: number;
   billingType: AsaasBillingType;
   dueDate: string;
-  totalValue?: number;
   description?: string;
   postalService?: boolean;
   daysAfterDueDateToRegistrationCancellation?: number;
@@ -50,4 +49,20 @@ export interface AsaasInstallmentCreateRequest {
     description?: string;
     installmentNumber?: number;
   }>;
+  creditCard?: AsaasCreditCardTokenizationRequest["creditCard"];
+  creditCardHolderInfo?: AsaasCreditCardTokenizationRequest["creditCardHolderInfo"];
+  creditCardToken?: string;
+  /** The buyer's IP. Asaas requires it on a card charge. */
+  remoteIp?: string;
 }
+
+/**
+ * The amount is `totalValue`, the whole plan, or `value`, ONE installment. Asaas
+ * takes either, and answers a request with neither with 400
+ * `invalid_installmentValue`. Sent together, `totalValue` wins and `value` is
+ * ignored: 5 each with a total of 12 comes out 6 and 6. Asaas divides a total
+ * itself and puts the leftover cent on the FIRST installment: 100 in 3 is
+ * 33.34, 33.33, 33.33. Measured in the sandbox, 2026-09-27.
+ */
+export type AsaasInstallmentCreateRequest = AsaasInstallmentCreateBase &
+  ({ totalValue: number; value?: number } | { value: number; totalValue?: number });

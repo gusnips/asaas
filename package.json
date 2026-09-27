@@ -1,7 +1,7 @@
 {
   "name": "@gusnips/asaas",
   "packageManager": "bun@1.4.2",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Unofficial TypeScript SDK for Asaas API with domain-based architecture",
   "repository": {
     "type": "git",

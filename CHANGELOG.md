@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.2] - 2026-09-27
+
+### Fixed
+
+- **Types**: the published declarations carry their doc comments again. `removeComments` stripped every one from `dist/index.d.ts`, so none of the measured warnings reached an editor: that `value` is refused on an installment charge, that a split's `fixedValue` is paid on every installment, or where the leftover cent lands. The JavaScript is unchanged.
+
 ## [2.2.1] - 2026-09-27
 
 ### Documented

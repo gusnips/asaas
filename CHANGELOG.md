@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.0] - 2026-09-27
+
+### Fixed
+
+- **Payments**: `create()` no longer lets you build a request Asaas refuses. `AsaasPaymentCreateRequest` is now a union, measured against the sandbox:
+  - one charge (`AsaasSinglePaymentCreateRequest`): `value`, and no `installmentCount`;
+  - a charge split into installments (`AsaasInstallmentPaymentCreateRequest`): `installmentCount` plus `totalValue` (Asaas divides it) or `installmentValue`, and no `value`.
+
+  `value` together with any `installmentCount`, 1 included, is answered with 400 `invalid_installmentValue` ("O valor da parcela deve ser informado."). The old type required `value` on every request, so the one shape it steered you to for installments was the one Asaas rejects. Code that stops compiling here was already failing at Asaas.
+- **Payments**: the create request now types the card fields Asaas takes on `POST /payments`: `creditCard`, `creditCardHolderInfo`, `creditCardToken` and `remoteIp`.
+
+### Documented
+
+- `split` on an installment charge: `fixedValue` is paid on every installment, `totalFixedValue` is divided across them, and an `installmentNumber` is ignored without an error on this endpoint (it needs `installments.create`). On a card, every installment must be at least R$ 5,00.
+
 ## [2.0.0] - 2026-05-30
 
 ### Breaking Changes

@@ -208,19 +208,16 @@ export interface AsaasListPaymentsOptions {
 }
 
 /**
- * Request interface for creating a payment
+ * Fields a create-payment request carries whether it is one charge or a
+ * charge split into installments.
  */
-export interface AsaasPaymentCreateRequest {
+export interface AsaasPaymentCreateBase {
   customer: string;
   billingType: AsaasBillingType;
-  value: number;
   dueDate: string;
   description?: string;
   daysAfterDueDateToRegistrationCancellation?: number;
   externalReference?: string;
-  installmentCount?: number;
-  totalValue?: number;
-  installmentValue?: number;
   discount?: {
     value?: number;
     dueDateLimitDays?: number;
@@ -229,6 +226,13 @@ export interface AsaasPaymentCreateRequest {
   interest?: { value?: number };
   fine?: { value?: number; type?: "FIXED" | "PERCENTAGE" };
   postalService?: boolean;
+  /**
+   * On an installment charge, `fixedValue` is paid out on EVERY installment
+   * (10 on a 3x charge pays 30), and `totalFixedValue` is divided across them
+   * (3.33 + 3.33 + 3.34). There is no "first installment only" on this
+   * endpoint: an `installmentNumber` here is ignored without an error. That
+   * needs `installments.create`.
+   */
   split?: Array<{
     walletId: string;
     fixedValue?: number;
@@ -241,7 +245,38 @@ export interface AsaasPaymentCreateRequest {
     successUrl: string;
     autoRedirect?: boolean;
   };
+  /** A card charge: the card itself, or `creditCardToken` from `tokenizeCreditCard`. */
+  creditCard?: AsaasCreditCardTokenizationRequest["creditCard"];
+  creditCardHolderInfo?: AsaasCreditCardTokenizationRequest["creditCardHolderInfo"];
+  creditCardToken?: string;
+  /** The buyer's IP. Asaas requires it on a card charge. */
+  remoteIp?: string;
 }
+
+/** One charge, for `value`. */
+export interface AsaasSinglePaymentCreateRequest extends AsaasPaymentCreateBase {
+  value: number;
+  /** Any count, 1 included, makes it an installment charge, where `value` is refused. */
+  installmentCount?: never;
+}
+
+/**
+ * One charge split into `installmentCount` installments, all under one
+ * `installment` id. Send `totalValue` and Asaas divides it, or
+ * `installmentValue` for each installment. `value` is refused here, whatever
+ * the count: Asaas answers 400 `invalid_installmentValue`.
+ *
+ * On a card, every installment must be at least R$ 5,00.
+ */
+export type AsaasInstallmentPaymentCreateRequest = AsaasPaymentCreateBase & {
+  installmentCount: number;
+  value?: never;
+} & ({ totalValue: number; installmentValue?: number } | { installmentValue: number; totalValue?: number });
+
+/** Request for creating a payment: one charge, or one split into installments. */
+export type AsaasPaymentCreateRequest =
+  | AsaasSinglePaymentCreateRequest
+  | AsaasInstallmentPaymentCreateRequest;
 
 /**
  * Credit card tokenization request

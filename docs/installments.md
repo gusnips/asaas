@@ -90,9 +90,8 @@ await client.installments.create({
 });
 ```
 
-Use `client.installments.create()` when a split must target one installment with
-`installmentNumber`. **Measured:** `POST /payments` ignored `installmentNumber` without returning
-an error.
+Only `client.installments.create()` exposes `installmentNumber` on a split when one destination
+must receive a specific installment.
 
 ## Remainder cents and list order
 

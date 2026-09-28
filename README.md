@@ -45,24 +45,24 @@ const pixQr = await client.payments.getPixQrCode(payment.id);
 
 ## Modules
 
-| Module           | Access                        | Description                                           |
-| ---------------- | ----------------------------- | ----------------------------------------------------- |
-| Customers        | `client.customers`            | Customer CRUD, restore, list with filters             |
-| Payments         | `client.payments`             | Charges, refunds, status, PIX QR, boleto, credit card |
-| Subscriptions    | `client.subscriptions`        | Recurring billing management                          |
-| Installments     | `client.installments`         | Installment payments                                  |
-| Payment Links    | `client.paymentLinks`         | Shareable payment links                               |
-| Transfers        | `client.transfers`            | Bank transfers, PIX, internal                         |
-| PIX              | `client.pix`                  | Address keys, QR codes, transactions                  |
-| Finance          | `client.finance`              | Balance, extract, statistics                          |
-| Invoices         | `client.invoices`             | Nota Fiscal (NFS-e) management                        |
-| Bills            | `client.bills`                | Bill payments (boletos de terceiros)                  |
-| Anticipations    | `client.anticipations`        | Receivable anticipation                               |
-| Webhooks         | `client.webhooks`             | Webhook configuration                                 |
-| Accounts         | `client.accounts`             | Sub-accounts (White Label)                            |
-| Payment Dunnings | `client.paymentDunnings`      | Debt recovery (Serasa)                                |
-| Notifications    | `client.notifications`        | Notification settings                                 |
-| Mobile Recharges | `client.mobilePhoneRecharges` | Cell phone top-ups                                    |
+| Module | Access | Description |
+|--------|--------|-------------|
+| Customers | `client.customers` | Customer CRUD, restore, list with filters |
+| Payments | `client.payments` | Charges, refunds, status, PIX QR, boleto, credit card |
+| Subscriptions | `client.subscriptions` | Recurring billing management |
+| Installments | `client.installments` | Installment payments |
+| Payment Links | `client.paymentLinks` | Shareable payment links |
+| Transfers | `client.transfers` | Bank transfers, PIX, internal |
+| PIX | `client.pix` | Address keys, QR codes, transactions |
+| Finance | `client.finance` | Balance, extract, statistics |
+| Invoices | `client.invoices` | Nota Fiscal (NFS-e) management |
+| Bills | `client.bills` | Bill payments (boletos de terceiros) |
+| Anticipations | `client.anticipations` | Receivable anticipation |
+| Webhooks | `client.webhooks` | Webhook configuration |
+| Accounts | `client.accounts` | Sub-accounts (White Label) |
+| Payment Dunnings | `client.paymentDunnings` | Debt recovery (Serasa) |
+| Notifications | `client.notifications` | Notification settings |
+| Mobile Recharges | `client.mobilePhoneRecharges` | Cell phone top-ups |
 
 ## Guides
 
@@ -102,9 +102,7 @@ const subscription = await client.subscriptions.create({
 });
 
 // List subscription payments
-const { data: payments } = await client.subscriptions.listPayments(
-  subscription.id,
-);
+const { data: payments } = await client.subscriptions.listPayments(subscription.id);
 ```
 
 ### Transfers
@@ -197,9 +195,7 @@ The SDK throws `AsaasApiError` for API errors with structured error information:
 import { AsaasApiError } from "@gusnips/asaas";
 
 try {
-  await client.payments.create({
-    // ...
-  });
+  await client.payments.create({ /* ... */ });
 } catch (error) {
   if (error instanceof AsaasApiError) {
     console.error(`Status: ${error.status}`);

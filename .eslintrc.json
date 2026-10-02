@@ -23,7 +23,18 @@
       }
     ],
     "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/await-thenable": "error"
+    "@typescript-eslint/await-thenable": "error",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value=/\\u2014/]",
+        "message": "No em dash in user-facing text. Use a period, comma, colon or parentheses."
+      },
+      {
+        "selector": "TemplateElement[value.raw=/\\u2014/]",
+        "message": "No em dash in user-facing text. Use a period, comma, colon or parentheses."
+      }
+    ]
   },
   "env": {
     "node": true,

@@ -17,7 +17,9 @@ const files = [
 const problems = files.flatMap((file) =>
   readFileSync(file, "utf8")
     .split("\n")
-    .flatMap((line, i) => (line.includes(EM_DASH) ? [`${file}:${i + 1}: ${line.trim()}`] : [])),
+    .flatMap((line, i) =>
+      line.includes(EM_DASH) ? [`${file}:${i + 1}: ${line.trim()}`] : [],
+    ),
 );
 
 if (problems.length > 0) {

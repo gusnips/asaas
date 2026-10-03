@@ -66,7 +66,7 @@ const pixQr = await client.payments.getPixQrCode(payment.id);
 
 ## Guides
 
-- [Installment purchases](https://github.com/gusnips/asaas/blob/main/docs/installments.md) — choose amount fields, handle splits, and avoid duplicate grants or reversals.
+- [Installment purchases](https://github.com/gusnips/asaas/blob/main/docs/installments.md): choose amount fields, handle splits, and avoid duplicate grants or reversals.
 
 ## Usage Examples
 

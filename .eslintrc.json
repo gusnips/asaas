@@ -1,4 +1,5 @@
 {
+  "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -31,7 +32,7 @@
         "message": "No em dash in user-facing text. Use a period, comma, colon or parentheses."
       },
       {
-        "selector": "TemplateElement[value.raw=/\\u2014/]",
+        "selector": "TemplateElement[value.cooked=/\\u2014/]",
         "message": "No em dash in user-facing text. Use a period, comma, colon or parentheses."
       }
     ]

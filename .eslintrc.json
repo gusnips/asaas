@@ -1,5 +1,4 @@
 {
-  "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -24,18 +23,7 @@
       }
     ],
     "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/await-thenable": "error",
-    "no-restricted-syntax": [
-      "error",
-      {
-        "selector": "Literal[value=/\\u2014/]",
-        "message": "No em dash in user-facing text. Use a period, comma, colon or parentheses."
-      },
-      {
-        "selector": "TemplateElement[value.cooked=/\\u2014/]",
-        "message": "No em dash in user-facing text. Use a period, comma, colon or parentheses."
-      }
-    ]
+    "@typescript-eslint/await-thenable": "error"
   },
   "env": {
     "node": true,

@@ -1,0 +1,33 @@
+{
+  // The preset holds the lint core. This file adds what the old ESLint config had on top:
+  // typescript-eslint recommended + recommended-requiring-type-checking, with its three own rules.
+  // Type-aware rules run on tsgolint (oxlint-tsgolint), which reads tsconfig.json.
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/@gusnips/oxlint/base.json"],
+  "plugins": [],
+  "options": { "typeAware": true },
+  "ignorePatterns": ["example.ts", "*.js", "*.mjs"],
+  "rules": {
+    // The repo's own levels: `any` and a missing return type warn, a lost promise is an error.
+    "typescript/no-explicit-any": "warn",
+    "typescript/explicit-function-return-type": "warn",
+    "typescript/no-floating-promises": "error",
+    "typescript/await-thenable": "error",
+
+    // recommended-requiring-type-checking rules that oxlint keeps outside `correctness`. The rest of
+    // that set is already on through `typeAware`.
+    "typescript/no-misused-promises": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unsafe-argument": "error",
+    "typescript/no-unsafe-assignment": "error",
+    "typescript/no-unsafe-call": "error",
+    "typescript/no-unsafe-enum-comparison": "error",
+    "typescript/no-unsafe-member-access": "error",
+    "typescript/no-unsafe-return": "error",
+    "typescript/require-await": "error",
+    "typescript/restrict-plus-operands": "error",
+
+    // eslint:recommended in ESLint 8, outside oxlint's `correctness`.
+    "no-inner-declarations": "error"
+  }
+}

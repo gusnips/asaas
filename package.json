@@ -17,8 +17,8 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint src --fix",
     "typecheck": "tsc --noEmit",
     "type-check": "tsc --noEmit",
     "test": "bun test",
@@ -41,10 +41,10 @@
   "author": "Gustavo Salomé (gusnips)",
   "license": "MIT",
   "devDependencies": {
+    "@gusnips/oxlint": "^0.2.0",
     "@types/bun": "latest",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.0.0",
+    "oxlint": "1.93.0",
+    "oxlint-tsgolint": "7.0.2007",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },

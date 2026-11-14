@@ -1,6 +1,6 @@
 {
   "name": "@gusnips/asaas",
-  "packageManager": "bun@1.4.2",
+  "packageManager": "bun@1.4.4",
   "version": "2.2.2",
   "description": "Unofficial TypeScript SDK for Asaas API with domain-based architecture",
   "repository": {

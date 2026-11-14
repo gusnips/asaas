@@ -46,7 +46,7 @@
     "oxlint": "1.93.0",
     "oxlint-tsgolint": "7.0.2007",
     "tsdown": "0.23.7",
-    "typescript": "^5.0.0"
+    "typescript": "^7.0.2"
   },
   "dependencies": {
     "axios": "^1.12.2"
